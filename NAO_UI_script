@@ -1,0 +1,896 @@
+library (ggplot2)
+library (dplyr)
+library (data.table)
+library (ggpubr)
+library (pastecs)
+
+#setwd("u:/phd/r/NAO_seesaw/")
+setwd("C:/Local_Science/NAO_seesaw")
+#setwd("C:/Users/FABIVS/Desktop/NAO_seesaw/")
+
+my_data=fread("NAO_UI_Fin_GL_v2.txt")
+
+my_data_p <- my_data[(my_data$Year>1930)]
+my_data_d <- my_data[(my_data$Year>1860)]
+
+my_data_palomaa <- my_data_p[!(my_data_p$UI_palomaa=="NA")]
+my_data_disko <- my_data_d[!(my_data_d$UI_disko=="NA")]
+
+
+#lowpass omit everything below 0.5SD.
+
+#UI
+#----
+halfSD_diskoUI <- 0.5*(sd(my_data_disko$ZUI_disko, na.rm = TRUE))
+halfSD_palomaaUI <- 0.5*(sd(my_data_palomaa$ZUI_palomaa, na.rm = TRUE))
+
+#tempanomalies
+#####
+#FMA temp anomaly
+halfSD_diskodisko_t_ <- 0.5*(sd(my_data_disko$disko_t_FMA, na.rm = TRUE))
+disko_disko_t_filtered1=my_data_disko[!(my_data_disko$disko_t_FMA > -(halfSD_diskodisko_t_) & my_data_disko$disko_t_FMA < (halfSD_diskodisko_t_)),]
+disko_disko_t_filtered=disko_disko_t_filtered1[!(disko_disko_t_filtered1$ZUI_disko > -(halfSD_diskoUI) & disko_disko_t_filtered1$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaapalomaa_t_ <- 0.5*(sd(my_data_palomaa$palomaa_t_FMA, na.rm = TRUE))
+palomaa_palomaa_t_filtered1=my_data_palomaa[!(my_data_palomaa$palomaa_t_FMA > -(halfSD_palomaapalomaa_t_) & my_data_palomaa$palomaa_t_FMA < (halfSD_palomaapalomaa_t_)),]
+palomaa_palomaa_t_filtered=palomaa_palomaa_t_filtered1[!(palomaa_palomaa_t_filtered1$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_palomaa_t_filtered1$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+
+
+#MJJ temp anomaly
+halfSD_diskodisko_t__MJJ <- 0.5*(sd(my_data_disko$disko_t_MJJ, na.rm = TRUE))
+disko_disko_t_filtered1_MJJ=my_data_disko[!(my_data_disko$disko_t_MJJ > -(halfSD_diskodisko_t__MJJ) & my_data_disko$disko_t_MJJ < (halfSD_diskodisko_t__MJJ)),]
+disko_disko_t_filtered_MJJ=disko_disko_t_filtered1_MJJ[!(disko_disko_t_filtered1_MJJ$ZUI_disko > -(halfSD_diskoUI) & disko_disko_t_filtered1_MJJ$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaapalomaa_t__MJJ <- 0.5*(sd(my_data_palomaa$palomaa_t_MJJ, na.rm = TRUE))
+palomaa_palomaa_t_filtered1_MJJ=my_data_palomaa[!(my_data_palomaa$palomaa_t_MJJ > -(halfSD_palomaapalomaa_t__MJJ) & my_data_palomaa$palomaa_t_MJJ < (halfSD_palomaapalomaa_t_)),]
+palomaa_palomaa_t_filtered_MJJ=palomaa_palomaa_t_filtered1_MJJ[!(palomaa_palomaa_t_filtered1_MJJ$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_palomaa_t_filtered1_MJJ$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+#NDJF temp anomaly
+halfSD_diskodisko_t__NDJF <- 0.5*(sd(my_data_disko$disko_t_NDJF, na.rm = TRUE))
+disko_disko_t_filtered1_NDJF=my_data_disko[!(my_data_disko$disko_t_NDJF > -(halfSD_diskodisko_t__NDJF) & my_data_disko$disko_t_NDJF < (halfSD_diskodisko_t__NDJF)),]
+disko_disko_t_filtered_NDJF=disko_disko_t_filtered1_NDJF[!(disko_disko_t_filtered1_NDJF$ZUI_disko > -(halfSD_diskoUI) & disko_disko_t_filtered1_NDJF$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaapalomaa_t__NDJF <- 0.5*(sd(my_data_palomaa$palomaa_t_NDJF, na.rm = TRUE))
+palomaa_palomaa_t_filtered1_NDJF=my_data_palomaa[!(my_data_palomaa$palomaa_t_NDJF > -(halfSD_palomaapalomaa_t__NDJF) & my_data_palomaa$palomaa_t_NDJF < (halfSD_palomaapalomaa_t_)),]
+palomaa_palomaa_t_filtered_NDJF=palomaa_palomaa_t_filtered1_NDJF[!(palomaa_palomaa_t_filtered1_NDJF$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_palomaa_t_filtered1_NDJF$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+#AM temp anomaly
+halfSD_diskodisko_t__AM <- 0.5*(sd(my_data_disko$disko_t_AM, na.rm = TRUE))
+disko_disko_t_filtered1_AM=my_data_disko[!(my_data_disko$disko_t_AM > -(halfSD_diskodisko_t__AM) & my_data_disko$disko_t_AM < (halfSD_diskodisko_t__AM)),]
+disko_disko_t_filtered_AM=disko_disko_t_filtered1_AM[!(disko_disko_t_filtered1_AM$ZUI_disko > -(halfSD_diskoUI) & disko_disko_t_filtered1_AM$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaapalomaa_t__AM <- 0.5*(sd(my_data_palomaa$palomaa_t_AM, na.rm = TRUE))
+palomaa_palomaa_t_filtered1_AM=my_data_palomaa[!(my_data_palomaa$palomaa_t_AM > -(halfSD_palomaapalomaa_t__AM) & my_data_palomaa$palomaa_t_AM < (halfSD_palomaapalomaa_t_)),]
+palomaa_palomaa_t_filtered_AM=palomaa_palomaa_t_filtered1_AM[!(palomaa_palomaa_t_filtered1_AM$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_palomaa_t_filtered1_AM$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+
+#####
+#FMA
+halfSD_diskoNAO2 <- 0.5*(sd(my_data_disko$NAO2FMA, na.rm = TRUE))
+disko_NAO2filtered1=my_data_disko[!(my_data_disko$NAO2FMA > -(halfSD_diskoNAO2) & my_data_disko$NAO2FMA < (halfSD_diskoNAO2)),]
+disko_NAO2filtered=disko_NAO2filtered1[!(disko_NAO2filtered1$ZUI_disko > -(halfSD_diskoUI) & disko_NAO2filtered1$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaaNAO2 <- 0.5*(sd(my_data_palomaa$NAO2FMA, na.rm = TRUE))
+palomaa_NAO2filtered1=my_data_palomaa[!(my_data_palomaa$NAO2FMA > -(halfSD_palomaaNAO2) & my_data_palomaa$NAO2FMA < (halfSD_palomaaNAO2)),]
+palomaa_NAO2filtered=palomaa_NAO2filtered1[!(palomaa_NAO2filtered1$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_NAO2filtered1$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+halfSD_diskoNAO1 <- 0.5*(sd(my_data_disko$NAO1FMA, na.rm = TRUE))
+disko_NAO1filtered1=my_data_disko[!(my_data_disko$NAO1FMA > -(halfSD_diskoNAO1) & my_data_disko$NAO1FMA < (halfSD_diskoNAO1)),]
+disko_NAO1filtered=disko_NAO1filtered1[!(disko_NAO1filtered1$ZUI_disko > -(halfSD_diskoUI) & disko_NAO1filtered1$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaaNAO1 <- 0.5*(sd(my_data_palomaa$NAO1FMA, na.rm = TRUE))
+palomaa_NAO1filtered1=my_data_palomaa[!(my_data_palomaa$NAO1FMA > -(halfSD_palomaaNAO1) & my_data_palomaa$NAO1FMA < (halfSD_palomaaNAO1)),]
+palomaa_NAO1filtered=palomaa_NAO1filtered1[!(palomaa_NAO1filtered1$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_NAO1filtered1$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+
+
+#MJJ
+halfSD_diskoNAO2_MJJ <- 0.5*(sd(my_data_disko$NAO2MJJ, na.rm = TRUE))
+disko_NAO2filtered1_MJJ=my_data_disko[!(my_data_disko$NAO2MJJ > -(halfSD_diskoNAO2_MJJ) & my_data_disko$NAO2MJJ < (halfSD_diskoNAO2_MJJ)),]
+disko_NAO2filtered_MJJ=disko_NAO2filtered1_MJJ[!(disko_NAO2filtered1_MJJ$ZUI_disko > -(halfSD_diskoUI) & disko_NAO2filtered1_MJJ$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaaNAO2_MJJ <- 0.5*(sd(my_data_palomaa$NAO2MJJ, na.rm = TRUE))
+palomaa_NAO2filtered1_MJJ=my_data_palomaa[!(my_data_palomaa$NAO2MJJ > -(halfSD_palomaaNAO2_MJJ) & my_data_palomaa$NAO2MJJ < (halfSD_palomaaNAO2_MJJ)),]
+palomaa_NAO2filtered_MJJ=palomaa_NAO2filtered1_MJJ[!(palomaa_NAO2filtered1_MJJ$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_NAO2filtered1_MJJ$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+halfSD_diskoNAO1_MJJ <- 0.5*(sd(my_data_disko$NAO1MJJ, na.rm = TRUE))
+disko_NAO1filtered1_MJJ=my_data_disko[!(my_data_disko$NAO1MJJ > -(halfSD_diskoNAO1_MJJ) & my_data_disko$NAO1MJJ < (halfSD_diskoNAO1_MJJ)),]
+disko_NAO1filtered_MJJ=disko_NAO1filtered1_MJJ[!(disko_NAO1filtered1_MJJ$ZUI_disko > -(halfSD_diskoUI) & disko_NAO1filtered1_MJJ$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaaNAO1_MJJ <- 0.5*(sd(my_data_palomaa$NAO1MJJ, na.rm = TRUE))
+palomaa_NAO1filtered1_MJJ=my_data_palomaa[!(my_data_palomaa$NAO1MJJ > -(halfSD_palomaaNAO1_MJJ) & my_data_palomaa$NAO1MJJ < (halfSD_palomaaNAO1)),]
+palomaa_NAO1filtered_MJJ=palomaa_NAO1filtered1_MJJ[!(palomaa_NAO1filtered1_MJJ$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_NAO1filtered1_MJJ$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+#NDJF
+halfSD_diskoNAO2_NDJF <- 0.5*(sd(my_data_disko$NAO2NDJF, na.rm = TRUE))
+disko_NAO2filtered1_NDJF=my_data_disko[!(my_data_disko$NAO2NDJF > -(halfSD_diskoNAO2_NDJF) & my_data_disko$NAO2NDJF < (halfSD_diskoNAO2_NDJF)),]
+disko_NAO2filtered_NDJF=disko_NAO2filtered1_NDJF[!(disko_NAO2filtered1_NDJF$ZUI_disko > -(halfSD_diskoUI) & disko_NAO2filtered1_NDJF$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaaNAO2_NDJF <- 0.5*(sd(my_data_palomaa$NAO2NDJF, na.rm = TRUE))
+palomaa_NAO2filtered1_NDJF=my_data_palomaa[!(my_data_palomaa$NAO2NDJF > -(halfSD_palomaaNAO2_NDJF) & my_data_palomaa$NAO2NDJF < (halfSD_palomaaNAO2_NDJF)),]
+palomaa_NAO2filtered_NDJF=palomaa_NAO2filtered1_NDJF[!(palomaa_NAO2filtered1_NDJF$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_NAO2filtered1_NDJF$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+halfSD_diskoNAO1_NDJF <- 0.5*(sd(my_data_disko$NAO1NDJF, na.rm = TRUE))
+disko_NAO1filtered1_NDJF=my_data_disko[!(my_data_disko$NAO1NDJF > -(halfSD_diskoNAO1_NDJF) & my_data_disko$NAO1NDJF < (halfSD_diskoNAO1_NDJF)),]
+disko_NAO1filtered_NDJF=disko_NAO1filtered1_NDJF[!(disko_NAO1filtered1_NDJF$ZUI_disko > -(halfSD_diskoUI) & disko_NAO1filtered1_NDJF$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaaNAO1_NDJF <- 0.5*(sd(my_data_palomaa$NAO1NDJF, na.rm = TRUE))
+palomaa_NAO1filtered1_NDJF=my_data_palomaa[!(my_data_palomaa$NAO1NDJF > -(halfSD_palomaaNAO1_NDJF) & my_data_palomaa$NAO1NDJF < (halfSD_palomaaNAO1)),]
+palomaa_NAO1filtered_NDJF=palomaa_NAO1filtered1_NDJF[!(palomaa_NAO1filtered1_NDJF$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_NAO1filtered1_NDJF$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+#AM
+halfSD_diskoNAO2_AM <- 0.5*(sd(my_data_disko$NAO2AM, na.rm = TRUE))
+disko_NAO2filtered1_AM=my_data_disko[!(my_data_disko$NAO2AM > -(halfSD_diskoNAO2_AM) & my_data_disko$NAO2AM < (halfSD_diskoNAO2_AM)),]
+disko_NAO2filtered_AM=disko_NAO2filtered1_AM[!(disko_NAO2filtered1_AM$ZUI_disko > -(halfSD_diskoUI) & disko_NAO2filtered1_AM$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaaNAO2_AM <- 0.5*(sd(my_data_palomaa$NAO2AM, na.rm = TRUE))
+palomaa_NAO2filtered1_AM=my_data_palomaa[!(my_data_palomaa$NAO2AM > -(halfSD_palomaaNAO2_AM) & my_data_palomaa$NAO2AM < (halfSD_palomaaNAO2_AM)),]
+palomaa_NAO2filtered_AM=palomaa_NAO2filtered1_AM[!(palomaa_NAO2filtered1_AM$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_NAO2filtered1_AM$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+halfSD_diskoNAO1_AM <- 0.5*(sd(my_data_disko$NAO1AM, na.rm = TRUE))
+disko_NAO1filtered1_AM=my_data_disko[!(my_data_disko$NAO1AM > -(halfSD_diskoNAO1_AM) & my_data_disko$NAO1AM < (halfSD_diskoNAO1_AM)),]
+disko_NAO1filtered_AM=disko_NAO1filtered1_AM[!(disko_NAO1filtered1_AM$ZUI_disko > -(halfSD_diskoUI) & disko_NAO1filtered1_AM$ZUI_disko < (halfSD_diskoUI)),]
+
+halfSD_palomaaNAO1_AM <- 0.5*(sd(my_data_palomaa$NAO1AM, na.rm = TRUE))
+palomaa_NAO1filtered1_AM=my_data_palomaa[!(my_data_palomaa$NAO1AM > -(halfSD_palomaaNAO1_AM) & my_data_palomaa$NAO1AM < (halfSD_palomaaNAO1)),]
+palomaa_NAO1filtered_AM=palomaa_NAO1filtered1_AM[!(palomaa_NAO1filtered1_AM$ZUI_palomaa > -(halfSD_palomaaUI) & palomaa_NAO1filtered1_AM$ZUI_palomaa < (halfSD_palomaaUI)),]
+
+
+
+
+##### 
+#statistics 
+
+#disko no filter vs temperature anomalies
+Disko_nofilter_vs_disko_t_ <- cor.test(my_data$UI_disko, my_data$disko_t_average, method = "pearson")
+Disko_nofilter_vs_disko_t__pearson <- Disko_nofilter_vs_disko_t_[["estimate"]][["cor"]]
+Disko_nofilter_vs_disko_t__p_value <- Disko_nofilter_vs_disko_t_[["p.value"]]
+Disko_nofilter_vs_disko_t__df_value <- Disko_nofilter_vs_disko_t_[["parameter"]][["df"]]
+format(round(Disko_nofilter_vs_disko_t__pearson, 3), nsmall = 3) -> Disko_nofilter_vs_disko_t__pearson_ab
+format(round(Disko_nofilter_vs_disko_t__p_value, 4), nsmall = 4) -> Disko_nofilter_vs_disko_t__p_value_ab
+Disko_nofilter_vs_disko_t__df_value + 2 -> Disko_nofilter_vs_disko_t__n_value
+
+#palomaa no filter vs temperature anomalies
+palomaa_nofilter_vs_palomaa_t_ <- cor.test(my_data$UI_palomaa, my_data$palomaa_t_average, method = "pearson")
+palomaa_nofilter_vs_palomaa_t__pearson <- palomaa_nofilter_vs_palomaa_t_[["estimate"]][["cor"]]
+palomaa_nofilter_vs_palomaa_t__p_value <- palomaa_nofilter_vs_palomaa_t_[["p.value"]]
+palomaa_nofilter_vs_palomaa_t__df_value <- palomaa_nofilter_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(palomaa_nofilter_vs_palomaa_t__pearson, 3), nsmall = 3) -> palomaa_nofilter_vs_palomaa_t__pearson_ab
+format(round(palomaa_nofilter_vs_palomaa_t__p_value, 4), nsmall = 4) -> palomaa_nofilter_vs_palomaa_t__p_value_ab
+palomaa_nofilter_vs_palomaa_t__df_value +2 -> palomaa_nofilter_vs_palomaa_t__n_value
+
+#NAO1 vs Disko temperature anomalies
+NAO1_vs_disko_t_ <- cor.test(my_data$NAO1Average, my_data$disko_t_average, method = "pearson")
+NAO1_vs_disko_t__pearson <- NAO1_vs_disko_t_[["estimate"]][["cor"]]
+NAO1_vs_disko_t__p_value <- NAO1_vs_disko_t_[["p.value"]]
+NAO1_vs_disko_t__df_value <- NAO1_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO1_vs_disko_t__pearson, 3), nsmall = 3) -> NAO1_vs_disko_t__pearson_ab
+format(round(NAO1_vs_disko_t__p_value, 4), nsmall = 4) -> NAO1_vs_disko_t__p_value_ab
+NAO1_vs_disko_t__df_value + 2 -> NAO1_vs_disko_t__n_value
+
+#NAO1 vs Palomaa temperature anomalies
+NAO1_vs_palomaa_t_ <- cor.test(my_data$NAO1Average, my_data$palomaa_t_average, method = "pearson")
+NAO1_vs_palomaa_t__pearson <- NAO1_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO1_vs_palomaa_t__p_value <- NAO1_vs_palomaa_t_[["p.value"]]
+NAO1_vs_palomaa_t__df_value <- NAO1_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO1_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO1_vs_palomaa_t__pearson_ab
+format(round(NAO1_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO1_vs_palomaa_t__p_value_ab
+NAO1_vs_palomaa_t__df_value +2 -> NAO1_vs_palomaa_t__n_value
+
+#NAO2 vs Disko temperature anomalies
+NAO2_vs_disko_t_ <- cor.test(my_data$NAO2Average, my_data$disko_t_average, method = "pearson")
+NAO2_vs_disko_t__pearson <- NAO2_vs_disko_t_[["estimate"]][["cor"]]
+NAO2_vs_disko_t__p_value <- NAO2_vs_disko_t_[["p.value"]]
+NAO2_vs_disko_t__df_value <- NAO2_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO2_vs_disko_t__pearson, 3), nsmall = 3) -> NAO2_vs_disko_t__pearson_ab
+format(round(NAO2_vs_disko_t__p_value, 4), nsmall = 4) -> NAO2_vs_disko_t__p_value_ab
+NAO2_vs_disko_t__df_value + 2 -> NAO2_vs_disko_t__n_value
+
+#NAO2 vs Palomaa temperature anomalies
+NAO2_vs_palomaa_t_ <- cor.test(my_data$NAO2Average, my_data$palomaa_t_average, method = "pearson")
+NAO2_vs_palomaa_t__pearson <- NAO2_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO2_vs_palomaa_t__p_value <- NAO2_vs_palomaa_t_[["p.value"]]
+NAO2_vs_palomaa_t__df_value <- NAO2_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO2_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO2_vs_palomaa_t__pearson_ab
+format(round(NAO2_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO2_vs_palomaa_t__p_value_ab
+NAO2_vs_palomaa_t__df_value +2 -> NAO2_vs_palomaa_t__n_value
+
+#NAO1FMA vs Disko temperature anomalies
+NAO1FMA_vs_disko_t_ <- cor.test(my_data$NAO1FMA, my_data$disko_t_average, method = "pearson")
+NAO1FMA_vs_disko_t__pearson <- NAO1FMA_vs_disko_t_[["estimate"]][["cor"]]
+NAO1FMA_vs_disko_t__p_value <- NAO1FMA_vs_disko_t_[["p.value"]]
+NAO1FMA_vs_disko_t__df_value <- NAO1FMA_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO1FMA_vs_disko_t__pearson, 3), nsmall = 3) -> NAO1FMA_vs_disko_t__pearson_ab
+format(round(NAO1FMA_vs_disko_t__p_value, 4), nsmall = 4) -> NAO1FMA_vs_disko_t__p_value_ab
+NAO1FMA_vs_disko_t__df_value + 2 -> NAO1FMA_vs_disko_t__n_value
+
+#NAO2FMA vs Disko temperature anomalies
+NAO2FMA_vs_disko_t_ <- cor.test(my_data$NAO2FMA, my_data$disko_t_average, method = "pearson")
+NAO2FMA_vs_disko_t__pearson <- NAO2FMA_vs_disko_t_[["estimate"]][["cor"]]
+NAO2FMA_vs_disko_t__p_value <- NAO2FMA_vs_disko_t_[["p.value"]]
+NAO2FMA_vs_disko_t__df_value <- NAO2FMA_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO2FMA_vs_disko_t__pearson, 3), nsmall = 3) -> NAO2FMA_vs_disko_t__pearson_ab
+format(round(NAO2FMA_vs_disko_t__p_value, 4), nsmall = 4) -> NAO2FMA_vs_disko_t__p_value_ab
+NAO2FMA_vs_disko_t__df_value + 2 -> NAO2FMA_vs_disko_t__n_value
+
+#NAO1FMA vs Palomaa temperature anomalies
+NAO1FMA_vs_palomaa_t_ <- cor.test(my_data$NAO1FMA, my_data$palomaa_t_average, method = "pearson")
+NAO1FMA_vs_palomaa_t__pearson <- NAO1FMA_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO1FMA_vs_palomaa_t__p_value <- NAO1FMA_vs_palomaa_t_[["p.value"]]
+NAO1FMA_vs_palomaa_t__df_value <- NAO1FMA_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO1FMA_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO1FMA_vs_palomaa_t__pearson_ab
+format(round(NAO1FMA_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO1FMA_vs_palomaa_t__p_value_ab
+NAO1FMA_vs_palomaa_t__df_value +2 -> NAO1FMA_vs_palomaa_t__n_value
+
+#NAO2FMA vs Palomaa temperature anomalies
+NAO2FMA_vs_palomaa_t_ <- cor.test(my_data$NAO2FMA, my_data$palomaa_t_average, method = "pearson")
+NAO2FMA_vs_palomaa_t__pearson <- NAO2FMA_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO2FMA_vs_palomaa_t__p_value <- NAO2FMA_vs_palomaa_t_[["p.value"]]
+NAO2FMA_vs_palomaa_t__df_value <- NAO2FMA_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO2FMA_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO2FMA_vs_palomaa_t__pearson_ab
+format(round(NAO2FMA_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO2FMA_vs_palomaa_t__p_value_ab
+NAO2FMA_vs_palomaa_t__df_value +2 -> NAO2FMA_vs_palomaa_t__n_value
+
+#NAO1MJJ vs Disko temperature anomalies
+NAO1MJJ_vs_disko_t_ <- cor.test(my_data$NAO1MJJ, my_data$disko_t_average, method = "pearson")
+NAO1MJJ_vs_disko_t__pearson <- NAO1MJJ_vs_disko_t_[["estimate"]][["cor"]]
+NAO1MJJ_vs_disko_t__p_value <- NAO1MJJ_vs_disko_t_[["p.value"]]
+NAO1MJJ_vs_disko_t__df_value <- NAO1MJJ_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO1MJJ_vs_disko_t__pearson, 3), nsmall = 3) -> NAO1MJJ_vs_disko_t__pearson_ab
+format(round(NAO1MJJ_vs_disko_t__p_value, 4), nsmall = 4) -> NAO1MJJ_vs_disko_t__p_value_ab
+NAO1MJJ_vs_disko_t__df_value + 2 -> NAO1MJJ_vs_disko_t__n_value
+
+#NAO2MJJ vs Disko temperature anomalies
+NAO2MJJ_vs_disko_t_ <- cor.test(my_data$NAO2MJJ, my_data$disko_t_average, method = "pearson")
+NAO2MJJ_vs_disko_t__pearson <- NAO2MJJ_vs_disko_t_[["estimate"]][["cor"]]
+NAO2MJJ_vs_disko_t__p_value <- NAO2MJJ_vs_disko_t_[["p.value"]]
+NAO2MJJ_vs_disko_t__df_value <- NAO2MJJ_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO2MJJ_vs_disko_t__pearson, 3), nsmall = 3) -> NAO2MJJ_vs_disko_t__pearson_ab
+format(round(NAO2MJJ_vs_disko_t__p_value, 4), nsmall = 4) -> NAO2MJJ_vs_disko_t__p_value_ab
+NAO2MJJ_vs_disko_t__df_value + 2 -> NAO2MJJ_vs_disko_t__n_value
+
+#NAO1MJJ vs Palomaa temperature anomalies
+NAO1MJJ_vs_palomaa_t_ <- cor.test(my_data$NAO1MJJ, my_data$palomaa_t_average, method = "pearson")
+NAO1MJJ_vs_palomaa_t__pearson <- NAO1MJJ_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO1MJJ_vs_palomaa_t__p_value <- NAO1MJJ_vs_palomaa_t_[["p.value"]]
+NAO1MJJ_vs_palomaa_t__df_value <- NAO1MJJ_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO1MJJ_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO1MJJ_vs_palomaa_t__pearson_ab
+format(round(NAO1MJJ_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO1MJJ_vs_palomaa_t__p_value_ab
+NAO1MJJ_vs_palomaa_t__df_value +2 -> NAO1MJJ_vs_palomaa_t__n_value
+
+#NAO2MJJ vs Palomaa temperature anomalies
+NAO2MJJ_vs_palomaa_t_ <- cor.test(my_data$NAO2MJJ, my_data$palomaa_t_average, method = "pearson")
+NAO2MJJ_vs_palomaa_t__pearson <- NAO2MJJ_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO2MJJ_vs_palomaa_t__p_value <- NAO2MJJ_vs_palomaa_t_[["p.value"]]
+NAO2MJJ_vs_palomaa_t__df_value <- NAO2MJJ_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO2MJJ_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO2MJJ_vs_palomaa_t__pearson_ab
+format(round(NAO2MJJ_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO2MJJ_vs_palomaa_t__p_value_ab
+NAO2MJJ_vs_palomaa_t__df_value +2 -> NAO2MJJ_vs_palomaa_t__n_value
+
+#NAO1NDJF vs Disko temperature anomalies
+NAO1NDJF_vs_disko_t_ <- cor.test(my_data$NAO1NDJF, my_data$disko_t_average, method = "pearson")
+NAO1NDJF_vs_disko_t__pearson <- NAO1NDJF_vs_disko_t_[["estimate"]][["cor"]]
+NAO1NDJF_vs_disko_t__p_value <- NAO1NDJF_vs_disko_t_[["p.value"]]
+NAO1NDJF_vs_disko_t__df_value <- NAO1NDJF_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO1NDJF_vs_disko_t__pearson, 3), nsmall = 3) -> NAO1NDJF_vs_disko_t__pearson_ab
+format(round(NAO1NDJF_vs_disko_t__p_value, 4), nsmall = 4) -> NAO1NDJF_vs_disko_t__p_value_ab
+NAO1NDJF_vs_disko_t__df_value + 2 -> NAO1NDJF_vs_disko_t__n_value
+
+#NAO2NDJF vs Disko temperature anomalies
+NAO2NDJF_vs_disko_t_ <- cor.test(my_data$NAO2NDJF, my_data$disko_t_average, method = "pearson")
+NAO2NDJF_vs_disko_t__pearson <- NAO2NDJF_vs_disko_t_[["estimate"]][["cor"]]
+NAO2NDJF_vs_disko_t__p_value <- NAO2NDJF_vs_disko_t_[["p.value"]]
+NAO2NDJF_vs_disko_t__df_value <- NAO2NDJF_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO2NDJF_vs_disko_t__pearson, 3), nsmall = 3) -> NAO2NDJF_vs_disko_t__pearson_ab
+format(round(NAO2NDJF_vs_disko_t__p_value, 4), nsmall = 4) -> NAO2NDJF_vs_disko_t__p_value_ab
+NAO2NDJF_vs_disko_t__df_value + 2 -> NAO2NDJF_vs_disko_t__n_value
+
+#NAO2NDJF vs Palomaa temperature anomalies
+NAO2NDJF_vs_palomaa_t_ <- cor.test(my_data$NAO2NDJF, my_data$palomaa_t_average, method = "pearson")
+NAO2NDJF_vs_palomaa_t__pearson <- NAO2NDJF_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO2NDJF_vs_palomaa_t__p_value <- NAO2NDJF_vs_palomaa_t_[["p.value"]]
+NAO2NDJF_vs_palomaa_t__df_value <- NAO2NDJF_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO2NDJF_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO2NDJF_vs_palomaa_t__pearson_ab
+format(round(NAO2NDJF_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO2NDJF_vs_palomaa_t__p_value_ab
+NAO2NDJF_vs_palomaa_t__df_value +2 -> NAO2NDJF_vs_palomaa_t__n_value
+
+#NAO1NDJF vs Palomaa temperature anomalies
+NAO1NDJF_vs_palomaa_t_ <- cor.test(my_data$NAO1NDJF, my_data$palomaa_t_average, method = "pearson")
+NAO1NDJF_vs_palomaa_t__pearson <- NAO1NDJF_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO1NDJF_vs_palomaa_t__p_value <- NAO1NDJF_vs_palomaa_t_[["p.value"]]
+NAO1NDJF_vs_palomaa_t__df_value <- NAO1NDJF_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO1NDJF_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO1NDJF_vs_palomaa_t__pearson_ab
+format(round(NAO1NDJF_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO1NDJF_vs_palomaa_t__p_value_ab
+NAO1NDJF_vs_palomaa_t__df_value +2 -> NAO1NDJF_vs_palomaa_t__n_value
+
+#NAO1AM vs Disko temperature anomalies
+NAO1AM_vs_disko_t_ <- cor.test(my_data$NAO1AM, my_data$disko_t_average, method = "pearson")
+NAO1AM_vs_disko_t__pearson <- NAO1AM_vs_disko_t_[["estimate"]][["cor"]]
+NAO1AM_vs_disko_t__p_value <- NAO1AM_vs_disko_t_[["p.value"]]
+NAO1AM_vs_disko_t__df_value <- NAO1AM_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO1AM_vs_disko_t__pearson, 3), nsmall = 3) -> NAO1AM_vs_disko_t__pearson_ab
+format(round(NAO1AM_vs_disko_t__p_value, 4), nsmall = 4) -> NAO1AM_vs_disko_t__p_value_ab
+NAO1AM_vs_disko_t__df_value + 2 -> NAO1AM_vs_disko_t__n_value
+
+#NAO2AM vs Disko temperature anomalies
+NAO2AM_vs_disko_t_ <- cor.test(my_data$NAO2AM, my_data$disko_t_average, method = "pearson")
+NAO2AM_vs_disko_t__pearson <- NAO2AM_vs_disko_t_[["estimate"]][["cor"]]
+NAO2AM_vs_disko_t__p_value <- NAO2AM_vs_disko_t_[["p.value"]]
+NAO2AM_vs_disko_t__df_value <- NAO2AM_vs_disko_t_[["parameter"]][["df"]]
+format(round(NAO2AM_vs_disko_t__pearson, 3), nsmall = 3) -> NAO2AM_vs_disko_t__pearson_ab
+format(round(NAO2AM_vs_disko_t__p_value, 4), nsmall = 4) -> NAO2AM_vs_disko_t__p_value_ab
+NAO2AM_vs_disko_t__df_value + 2 -> NAO2AM_vs_disko_t__n_value
+
+#NAO1AM vs Palomaa temperature anomalies
+NAO1AM_vs_palomaa_t_ <- cor.test(my_data$NAO1AM, my_data$palomaa_t_average, method = "pearson")
+NAO1AM_vs_palomaa_t__pearson <- NAO1AM_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO1AM_vs_palomaa_t__p_value <- NAO1AM_vs_palomaa_t_[["p.value"]]
+NAO1AM_vs_palomaa_t__df_value <- NAO1AM_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO1AM_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO1AM_vs_palomaa_t__pearson_ab
+format(round(NAO1AM_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO1AM_vs_palomaa_t__p_value_ab
+NAO1AM_vs_palomaa_t__df_value +2 -> NAO1AM_vs_palomaa_t__n_value
+
+#NAO2AM vs Palomaa temperature anomalies
+NAO2AM_vs_palomaa_t_ <- cor.test(my_data$NAO2AM, my_data$palomaa_t_average, method = "pearson")
+NAO2AM_vs_palomaa_t__pearson <- NAO2AM_vs_palomaa_t_[["estimate"]][["cor"]]
+NAO2AM_vs_palomaa_t__p_value <- NAO2AM_vs_palomaa_t_[["p.value"]]
+NAO2AM_vs_palomaa_t__df_value <- NAO2AM_vs_palomaa_t_[["parameter"]][["df"]]
+format(round(NAO2AM_vs_palomaa_t__pearson, 3), nsmall = 3) -> NAO2AM_vs_palomaa_t__pearson_ab
+format(round(NAO2AM_vs_palomaa_t__p_value, 4), nsmall = 4) -> NAO2AM_vs_palomaa_t__p_value_ab
+NAO2AM_vs_palomaa_t__df_value +2 -> NAO2AM_vs_palomaa_t__n_value
+
+#Palomaa vs Disko UI
+NAO_1_vs_2 <- cor.test(my_data$NAO1Average, my_data$NAO2Average, method = "pearson")
+NAO_1_vs_2_pearson <- NAO_1_vs_2[["estimate"]][["cor"]]
+NAO_1_vs_2_p_value <- NAO_1_vs_2[["p.value"]]
+NAO_1_vs_2_df_value <- NAO_1_vs_2[["parameter"]][["df"]]
+format(round(NAO_1_vs_2_pearson, 3), nsmall = 3) -> NAO_1_vs_2_pearson_ab
+format(round(NAO_1_vs_2_p_value, 4), nsmall = 4) -> NAO_1_vs_2_p_value_ab
+NAO_1_vs_2_df_value + 2 -> NAO_1_vs_2_n_value
+
+#disko no filter vs nao1
+Disko_nofilter_vs_NAO1 <- cor.test(my_data$UI_disko, my_data$NAO1Average, method = "pearson")
+Disko_nofilter_vs_NAO1_pearson <- Disko_nofilter_vs_NAO1[["estimate"]][["cor"]]
+Disko_nofilter_vs_NAO1_p_value <- Disko_nofilter_vs_NAO1[["p.value"]]
+Disko_nofilter_vs_NAO1_df_value <- Disko_nofilter_vs_NAO1[["parameter"]][["df"]]
+format(round(Disko_nofilter_vs_NAO1_pearson, 3), nsmall = 3) -> Disko_nofilter_vs_NAO1_pearson_ab
+format(round(Disko_nofilter_vs_NAO1_p_value, 4), nsmall = 4) -> Disko_nofilter_vs_NAO1_p_value_ab
+Disko_nofilter_vs_NAO1_df_value + 2 -> Disko_nofilter_vs_NAO1_n_value
+
+#disko no filter vs nao2
+Disko_nofilter_vs_NAO2 <- cor.test(my_data$UI_disko, my_data$NAO2Average, method = "pearson")
+Disko_nofilter_vs_NAO2_pearson <- Disko_nofilter_vs_NAO2[["estimate"]][["cor"]]
+Disko_nofilter_vs_NAO2_p_value <- Disko_nofilter_vs_NAO2[["p.value"]]
+Disko_nofilter_vs_NAO2_df_value <- Disko_nofilter_vs_NAO2[["parameter"]][["df"]]
+format(round(Disko_nofilter_vs_NAO2_pearson, 3), nsmall = 3) -> Disko_nofilter_vs_NAO2_pearson_ab
+format(round(Disko_nofilter_vs_NAO2_p_value, 4), nsmall = 4) -> Disko_nofilter_vs_NAO2_p_value_ab
+Disko_nofilter_vs_NAO2_df_value + 2 -> Disko_nofilter_vs_NAO2_n_value
+
+#palomaa no filter vs nao1
+palomaa_nofilter_vs_NAO1 <- cor.test(my_data$UI_palomaa, my_data$NAO1Average, method = "pearson")
+palomaa_nofilter_vs_NAO1_pearson <- palomaa_nofilter_vs_NAO1[["estimate"]][["cor"]]
+palomaa_nofilter_vs_NAO1_p_value <- palomaa_nofilter_vs_NAO1[["p.value"]]
+palomaa_nofilter_vs_NAO1_df_value <- palomaa_nofilter_vs_NAO1[["parameter"]][["df"]]
+format(round(palomaa_nofilter_vs_NAO1_pearson, 3), nsmall = 3) -> palomaa_nofilter_vs_NAO1_pearson_ab
+format(round(palomaa_nofilter_vs_NAO1_p_value, 4), nsmall = 4) -> palomaa_nofilter_vs_NAO1_p_value_ab
+palomaa_nofilter_vs_NAO1_df_value +2 -> palomaa_nofilter_vs_NAO1_n_value
+
+#palomaa no filter vs nao2
+palomaa_nofilter_vs_NAO2 <- cor.test(my_data$UI_palomaa, my_data$NAO2Average, method = "pearson")
+palomaa_nofilter_vs_NAO2_pearson <- palomaa_nofilter_vs_NAO2[["estimate"]][["cor"]]
+palomaa_nofilter_vs_NAO2_p_value <- palomaa_nofilter_vs_NAO2[["p.value"]]
+palomaa_nofilter_vs_NAO2_df_value <- palomaa_nofilter_vs_NAO2[["parameter"]][["df"]]
+format(round(palomaa_nofilter_vs_NAO2_pearson, 3), nsmall = 3) -> palomaa_nofilter_vs_NAO2_pearson_ab
+format(round(palomaa_nofilter_vs_NAO2_p_value, 4), nsmall = 4) -> palomaa_nofilter_vs_NAO2_p_value_ab
+palomaa_nofilter_vs_NAO2_df_value + 2 -> palomaa_nofilter_vs_NAO2_n_value
+
+#####
+#FMA temp anomaly
+disko_disko_t__pearsonFMA <- cor.test(disko_disko_t_filtered$UI_disko, disko_disko_t_filtered$disko_t_FMA, method = "pearson" )
+palomaa_palomaa_t__pearsonFMA <- cor.test(palomaa_palomaa_t_filtered$UI_palomaa, palomaa_palomaa_t_filtered$palomaa_t_FMA, method = "pearson" )
+
+
+#MJJ temp anomaly
+disko_disko_t__pearsonMJJ <- cor.test(disko_disko_t_filtered_MJJ$UI_disko, disko_disko_t_filtered_MJJ$disko_t_MJJ, method = "pearson" )
+palomaa_palomaa_t__pearsonMJJ <- cor.test(palomaa_palomaa_t_filtered_MJJ$UI_palomaa, palomaa_palomaa_t_filtered_MJJ$palomaa_t_MJJ, method = "pearson" )
+
+#NDJF temp anomaly
+disko_disko_t__pearsonNDJF <- cor.test(disko_disko_t_filtered_NDJF$UI_disko, disko_disko_t_filtered_NDJF$disko_t_NDJF, method = "pearson" )
+palomaa_palomaa_t__pearsonNDJF <- cor.test(palomaa_palomaa_t_filtered_NDJF$UI_palomaa, palomaa_palomaa_t_filtered_NDJF$palomaa_t_NDJF, method = "pearson" )
+
+#AM temp anomaly
+disko_disko_t__pearsonAM <- cor.test(disko_disko_t_filtered_AM$UI_disko, disko_disko_t_filtered_AM$disko_t_AM, method = "pearson" )
+palomaa_palomaa_t__pearsonAM <- cor.test(palomaa_palomaa_t_filtered_AM$UI_palomaa, palomaa_palomaa_t_filtered_AM$palomaa_t_AM, method = "pearson" )
+
+
+#FMA temp anomaly
+disko_disko_t_FMA_pearson <- disko_disko_t__pearsonFMA[["estimate"]][["cor"]]
+disko_disko_t_FMA_p_value <- disko_disko_t__pearsonFMA[["p.value"]]
+disko_disko_t_FMA_df_value <- disko_disko_t__pearsonFMA[["parameter"]][["df"]]
+palomaa_palomaa_t_FMA_pearson<- palomaa_palomaa_t__pearsonFMA[["estimate"]][["cor"]]
+palomaa_palomaa_t_FMA_p_value<- palomaa_palomaa_t__pearsonFMA[["p.value"]]
+palomaa_palomaa_t_FMA_df_value<- palomaa_palomaa_t__pearsonFMA[["parameter"]][["df"]]
+
+format(round(disko_disko_t_FMA_pearson, 3), nsmall = 3) -> disko_disko_t_FMA_pearson_ab
+format(round(disko_disko_t_FMA_p_value, 4), nsmall = 4) -> disko_disko_t_FMA_p_value_ab
+disko_disko_t_FMA_df_value +2 -> disko_disko_t_FMA_n_value
+format(round(palomaa_palomaa_t_FMA_pearson, 3), nsmall = 3) -> palomaa_palomaa_t_FMA_pearson_ab
+format(round(palomaa_palomaa_t_FMA_p_value, 4), nsmall = 4) -> palomaa_palomaa_t_FMA_p_value_ab
+palomaa_palomaa_t_FMA_df_value +2 -> palomaa_palomaa_t_FMA_n_value
+
+#MJJ temp anomaly
+disko_disko_t_MJJ_pearson <- disko_disko_t__pearsonMJJ[["estimate"]][["cor"]]
+disko_disko_t_MJJ_p_value <- disko_disko_t__pearsonMJJ[["p.value"]]
+disko_disko_t_MJJ_df_value <- disko_disko_t__pearsonMJJ[["parameter"]][["df"]]
+palomaa_palomaa_t_MJJ_pearson<- palomaa_palomaa_t__pearsonMJJ[["estimate"]][["cor"]]
+palomaa_palomaa_t_MJJ_p_value<- palomaa_palomaa_t__pearsonMJJ[["p.value"]]
+palomaa_palomaa_t_MJJ_df_value<- palomaa_palomaa_t__pearsonMJJ[["parameter"]][["df"]]
+
+format(round(disko_disko_t_MJJ_pearson, 3), nsmall = 3) -> disko_disko_t_MJJ_pearson_ab
+format(round(disko_disko_t_MJJ_p_value, 4), nsmall = 4) -> disko_disko_t_MJJ_p_value_ab
+disko_disko_t_MJJ_df_value +2 -> disko_disko_t_MJJ_n_value
+format(round(palomaa_palomaa_t_MJJ_pearson, 3), nsmall = 3) -> palomaa_palomaa_t_MJJ_pearson_ab
+format(round(palomaa_palomaa_t_MJJ_p_value, 4), nsmall = 4) -> palomaa_palomaa_t_MJJ_p_value_ab
+palomaa_palomaa_t_MJJ_df_value +2 -> palomaa_palomaa_t_MJJ_n_value
+
+#NDJF temp anomaly
+disko_disko_t_NDJF_pearson <- disko_disko_t__pearsonNDJF[["estimate"]][["cor"]]
+disko_disko_t_NDJF_p_value <- disko_disko_t__pearsonNDJF[["p.value"]]
+disko_disko_t_NDJF_df_value <- disko_disko_t__pearsonNDJF[["parameter"]][["df"]]
+palomaa_palomaa_t_NDJF_pearson<- palomaa_palomaa_t__pearsonNDJF[["estimate"]][["cor"]]
+palomaa_palomaa_t_NDJF_p_value<- palomaa_palomaa_t__pearsonNDJF[["p.value"]]
+palomaa_palomaa_t_NDJF_df_value<- palomaa_palomaa_t__pearsonNDJF[["parameter"]][["df"]]
+
+format(round(disko_disko_t_NDJF_pearson, 3), nsmall = 3) -> disko_disko_t_NDJF_pearson_ab
+format(round(disko_disko_t_NDJF_p_value, 4), nsmall = 4) -> disko_disko_t_NDJF_p_value_ab
+disko_disko_t_NDJF_df_value +2 -> disko_disko_t_NDJF_n_value
+format(round(palomaa_palomaa_t_NDJF_pearson, 3), nsmall = 3) -> palomaa_palomaa_t_NDJF_pearson_ab
+format(round(palomaa_palomaa_t_NDJF_p_value, 4), nsmall = 4) -> palomaa_palomaa_t_NDJF_p_value_ab
+palomaa_palomaa_t_NDJF_df_value +2 -> palomaa_palomaa_t_NDJF_n_value
+
+#AM temp anomaly
+disko_disko_t_AM_pearson <- disko_disko_t__pearsonAM[["estimate"]][["cor"]]
+disko_disko_t_AM_p_value <- disko_disko_t__pearsonAM[["p.value"]]
+disko_disko_t_AM_df_value <- disko_disko_t__pearsonAM[["parameter"]][["df"]]
+palomaa_palomaa_t_AM_pearson<- palomaa_palomaa_t__pearsonAM[["estimate"]][["cor"]]
+palomaa_palomaa_t_AM_p_value<- palomaa_palomaa_t__pearsonAM[["p.value"]]
+palomaa_palomaa_t_AM_df_value<- palomaa_palomaa_t__pearsonAM[["parameter"]][["df"]]
+
+format(round(disko_disko_t_AM_pearson, 3), nsmall = 3) -> disko_disko_t_AM_pearson_ab
+format(round(disko_disko_t_AM_p_value, 4), nsmall = 4) -> disko_disko_t_AM_p_value_ab
+disko_disko_t_AM_df_value +2 -> disko_disko_t_AM_n_value
+format(round(palomaa_palomaa_t_AM_pearson, 3), nsmall = 3) -> palomaa_palomaa_t_AM_pearson_ab
+format(round(palomaa_palomaa_t_AM_p_value, 4), nsmall = 4) -> palomaa_palomaa_t_AM_p_value_ab
+palomaa_palomaa_t_AM_df_value +2 -> palomaa_palomaa_t_AM_n_value
+
+#####
+#FMA
+disko_NAO2_pearsonFMA <- cor.test(disko_NAO2filtered$UI_disko, disko_NAO2filtered$NAO2FMA, method = "pearson" )
+palomaa_NAO2_pearsonFMA <- cor.test(palomaa_NAO2filtered$UI_palomaa, palomaa_NAO2filtered$NAO2FMA, method = "pearson" )
+disko_NAO1_pearsonFMA <- cor.test(disko_NAO1filtered$UI_disko, disko_NAO1filtered$NAO1FMA, method = "pearson" )
+palomaa_NAO1_pearsonFMA <- cor.test(palomaa_NAO1filtered$UI_palomaa, palomaa_NAO1filtered$NAO1FMA, method = "pearson" )
+
+#MJJ
+disko_NAO2_pearsonMJJ <- cor.test(disko_NAO2filtered_MJJ$UI_disko, disko_NAO2filtered_MJJ$NAO2MJJ, method = "pearson" )
+palomaa_NAO2_pearsonMJJ <- cor.test(palomaa_NAO2filtered_MJJ$UI_palomaa, palomaa_NAO2filtered_MJJ$NAO2MJJ, method = "pearson" )
+disko_NAO1_pearsonMJJ <- cor.test(disko_NAO1filtered_MJJ$UI_disko, disko_NAO1filtered_MJJ$NAO1MJJ, method = "pearson" )
+palomaa_NAO1_pearsonMJJ <- cor.test(palomaa_NAO1filtered_MJJ$UI_palomaa, palomaa_NAO1filtered_MJJ$NAO1MJJ, method = "pearson" )
+
+#NDJF
+disko_NAO2_pearsonNDJF <- cor.test(disko_NAO2filtered_NDJF$UI_disko, disko_NAO2filtered_NDJF$NAO2NDJF, method = "pearson" )
+palomaa_NAO2_pearsonNDJF <- cor.test(palomaa_NAO2filtered_NDJF$UI_palomaa, palomaa_NAO2filtered_NDJF$NAO2NDJF, method = "pearson" )
+disko_NAO1_pearsonNDJF <- cor.test(disko_NAO1filtered_NDJF$UI_disko, disko_NAO1filtered_NDJF$NAO1NDJF, method = "pearson" )
+palomaa_NAO1_pearsonNDJF <- cor.test(palomaa_NAO1filtered_NDJF$UI_palomaa, palomaa_NAO1filtered_NDJF$NAO1NDJF, method = "pearson" )
+
+#AM
+disko_NAO2_pearsonAM <- cor.test(disko_NAO2filtered_AM$UI_disko, disko_NAO2filtered_AM$NAO2AM, method = "pearson" )
+palomaa_NAO2_pearsonAM <- cor.test(palomaa_NAO2filtered_AM$UI_palomaa, palomaa_NAO2filtered_AM$NAO2AM, method = "pearson" )
+disko_NAO1_pearsonAM <- cor.test(disko_NAO1filtered_AM$UI_disko, disko_NAO1filtered_AM$NAO1AM, method = "pearson" )
+palomaa_NAO1_pearsonAM <- cor.test(palomaa_NAO1filtered_AM$UI_palomaa, palomaa_NAO1filtered_AM$NAO1AM, method = "pearson" )
+
+
+#FMA
+disko_NAO2FMA_pearson <- disko_NAO2_pearsonFMA[["estimate"]][["cor"]]
+disko_NAO2FMA_p_value <- disko_NAO2_pearsonFMA[["p.value"]]
+disko_NAO2FMA_df_value <- disko_NAO2_pearsonFMA[["parameter"]][["df"]]
+palomaa_NAO2FMA_pearson <- palomaa_NAO2_pearsonFMA[["estimate"]][["cor"]]
+palomaa_NAO2FMA_p_value <- palomaa_NAO2_pearsonFMA[["p.value"]]
+palomaa_NAO2FMA_df_value <- palomaa_NAO2_pearsonFMA[["parameter"]][["df"]]
+disko_NAO1FMA_pearson <- disko_NAO1_pearsonFMA[["estimate"]][["cor"]]
+disko_NAO1FMA_p_value <- disko_NAO1_pearsonFMA[["p.value"]]
+disko_NAO1FMA_df_value <- disko_NAO1_pearsonFMA[["parameter"]][["df"]]
+palomaa_NAO1FMA_pearson<- palomaa_NAO1_pearsonFMA[["estimate"]][["cor"]]
+palomaa_NAO1FMA_p_value<- palomaa_NAO1_pearsonFMA[["p.value"]]
+palomaa_NAO1FMA_df_value<- palomaa_NAO1_pearsonFMA[["parameter"]][["df"]]
+
+format(round(disko_NAO2FMA_pearson, 3), nsmall = 3) -> disko_NAO2FMA_pearson_ab
+format(round(disko_NAO2FMA_p_value, 4), nsmall = 4) -> disko_NAO2FMA_p_value_ab
+disko_NAO2FMA_df_value +2 -> disko_NAO2FMA_n_value
+format(round(palomaa_NAO2FMA_pearson, 3), nsmall = 3) -> palomaa_NAO2FMA_pearson_ab
+format(round(palomaa_NAO2FMA_p_value, 4), nsmall = 4) -> palomaa_NAO2FMA_p_value_ab
+palomaa_NAO2FMA_df_value +2 -> palomaa_NAO2FMA_n_value
+format(round(disko_NAO1FMA_pearson, 3), nsmall = 3) -> disko_NAO1FMA_pearson_ab
+format(round(disko_NAO1FMA_p_value, 4), nsmall = 4) -> disko_NAO1FMA_p_value_ab
+disko_NAO1FMA_df_value +2 -> disko_NAO1FMA_n_value
+format(round(palomaa_NAO1FMA_pearson, 3), nsmall = 3) -> palomaa_NAO1FMA_pearson_ab
+format(round(palomaa_NAO1FMA_p_value, 4), nsmall = 4) -> palomaa_NAO1FMA_p_value_ab
+palomaa_NAO1FMA_df_value +2 -> palomaa_NAO1FMA_n_value
+
+#MJJ
+disko_NAO2MJJ_pearson <- disko_NAO2_pearsonMJJ[["estimate"]][["cor"]]
+disko_NAO2MJJ_p_value <- disko_NAO2_pearsonMJJ[["p.value"]]
+disko_NAO2MJJ_df_value <- disko_NAO2_pearsonMJJ[["parameter"]][["df"]]
+palomaa_NAO2MJJ_pearson <- palomaa_NAO2_pearsonMJJ[["estimate"]][["cor"]]
+palomaa_NAO2MJJ_p_value <- palomaa_NAO2_pearsonMJJ[["p.value"]]
+palomaa_NAO2MJJ_df_value <- palomaa_NAO2_pearsonMJJ[["parameter"]][["df"]]
+disko_NAO1MJJ_pearson <- disko_NAO1_pearsonMJJ[["estimate"]][["cor"]]
+disko_NAO1MJJ_p_value <- disko_NAO1_pearsonMJJ[["p.value"]]
+disko_NAO1MJJ_df_value <- disko_NAO1_pearsonMJJ[["parameter"]][["df"]]
+palomaa_NAO1MJJ_pearson<- palomaa_NAO1_pearsonMJJ[["estimate"]][["cor"]]
+palomaa_NAO1MJJ_p_value<- palomaa_NAO1_pearsonMJJ[["p.value"]]
+palomaa_NAO1MJJ_df_value<- palomaa_NAO1_pearsonMJJ[["parameter"]][["df"]]
+
+format(round(disko_NAO2MJJ_pearson, 3), nsmall = 3) -> disko_NAO2MJJ_pearson_ab
+format(round(disko_NAO2MJJ_p_value, 4), nsmall = 4) -> disko_NAO2MJJ_p_value_ab
+disko_NAO2MJJ_df_value +2 -> disko_NAO2MJJ_n_value
+format(round(palomaa_NAO2MJJ_pearson, 3), nsmall = 3) -> palomaa_NAO2MJJ_pearson_ab
+format(round(palomaa_NAO2MJJ_p_value, 4), nsmall = 4) -> palomaa_NAO2MJJ_p_value_ab
+palomaa_NAO2MJJ_df_value +2 -> palomaa_NAO2MJJ_n_value
+format(round(disko_NAO1MJJ_pearson, 3), nsmall = 3) -> disko_NAO1MJJ_pearson_ab
+format(round(disko_NAO1MJJ_p_value, 4), nsmall = 4) -> disko_NAO1MJJ_p_value_ab
+disko_NAO1MJJ_df_value +2 -> disko_NAO1MJJ_n_value
+format(round(palomaa_NAO1MJJ_pearson, 3), nsmall = 3) -> palomaa_NAO1MJJ_pearson_ab
+format(round(palomaa_NAO1MJJ_p_value, 4), nsmall = 4) -> palomaa_NAO1MJJ_p_value_ab
+palomaa_NAO1MJJ_df_value +2 -> palomaa_NAO1MJJ_n_value
+
+#NDJF
+disko_NAO2NDJF_pearson <- disko_NAO2_pearsonNDJF[["estimate"]][["cor"]]
+disko_NAO2NDJF_p_value <- disko_NAO2_pearsonNDJF[["p.value"]]
+disko_NAO2NDJF_df_value <- disko_NAO2_pearsonNDJF[["parameter"]][["df"]]
+palomaa_NAO2NDJF_pearson <- palomaa_NAO2_pearsonNDJF[["estimate"]][["cor"]]
+palomaa_NAO2NDJF_p_value <- palomaa_NAO2_pearsonNDJF[["p.value"]]
+palomaa_NAO2NDJF_df_value <- palomaa_NAO2_pearsonNDJF[["parameter"]][["df"]]
+disko_NAO1NDJF_pearson <- disko_NAO1_pearsonNDJF[["estimate"]][["cor"]]
+disko_NAO1NDJF_p_value <- disko_NAO1_pearsonNDJF[["p.value"]]
+disko_NAO1NDJF_df_value <- disko_NAO1_pearsonNDJF[["parameter"]][["df"]]
+palomaa_NAO1NDJF_pearson<- palomaa_NAO1_pearsonNDJF[["estimate"]][["cor"]]
+palomaa_NAO1NDJF_p_value<- palomaa_NAO1_pearsonNDJF[["p.value"]]
+palomaa_NAO1NDJF_df_value<- palomaa_NAO1_pearsonNDJF[["parameter"]][["df"]]
+
+format(round(disko_NAO2NDJF_pearson, 3), nsmall = 3) -> disko_NAO2NDJF_pearson_ab
+format(round(disko_NAO2NDJF_p_value, 4), nsmall = 4) -> disko_NAO2NDJF_p_value_ab
+disko_NAO2NDJF_df_value +2 -> disko_NAO2NDJF_n_value
+format(round(palomaa_NAO2NDJF_pearson, 3), nsmall = 3) -> palomaa_NAO2NDJF_pearson_ab
+format(round(palomaa_NAO2NDJF_p_value, 4), nsmall = 4) -> palomaa_NAO2NDJF_p_value_ab
+palomaa_NAO2NDJF_df_value +2 -> palomaa_NAO2NDJF_n_value
+format(round(disko_NAO1NDJF_pearson, 3), nsmall = 3) -> disko_NAO1NDJF_pearson_ab
+format(round(disko_NAO1NDJF_p_value, 4), nsmall = 4) -> disko_NAO1NDJF_p_value_ab
+disko_NAO1NDJF_df_value +2 -> disko_NAO1NDJF_n_value
+format(round(palomaa_NAO1NDJF_pearson, 3), nsmall = 3) -> palomaa_NAO1NDJF_pearson_ab
+format(round(palomaa_NAO1NDJF_p_value, 4), nsmall = 4) -> palomaa_NAO1NDJF_p_value_ab
+palomaa_NAO1NDJF_df_value +2 -> palomaa_NAO1NDJF_n_value
+
+#AM
+disko_NAO2AM_pearson <- disko_NAO2_pearsonAM[["estimate"]][["cor"]]
+disko_NAO2AM_p_value <- disko_NAO2_pearsonAM[["p.value"]]
+disko_NAO2AM_df_value <- disko_NAO2_pearsonAM[["parameter"]][["df"]]
+palomaa_NAO2AM_pearson <- palomaa_NAO2_pearsonAM[["estimate"]][["cor"]]
+palomaa_NAO2AM_p_value <- palomaa_NAO2_pearsonAM[["p.value"]]
+palomaa_NAO2AM_df_value <- palomaa_NAO2_pearsonAM[["parameter"]][["df"]]
+disko_NAO1AM_pearson <- disko_NAO1_pearsonAM[["estimate"]][["cor"]]
+disko_NAO1AM_p_value <- disko_NAO1_pearsonAM[["p.value"]]
+disko_NAO1AM_df_value <- disko_NAO1_pearsonAM[["parameter"]][["df"]]
+palomaa_NAO1AM_pearson<- palomaa_NAO1_pearsonAM[["estimate"]][["cor"]]
+palomaa_NAO1AM_p_value<- palomaa_NAO1_pearsonAM[["p.value"]]
+palomaa_NAO1AM_df_value<- palomaa_NAO1_pearsonAM[["parameter"]][["df"]]
+
+format(round(disko_NAO2AM_pearson, 3), nsmall = 3) -> disko_NAO2AM_pearson_ab
+format(round(disko_NAO2AM_p_value, 4), nsmall = 4) -> disko_NAO2AM_p_value_ab
+disko_NAO2AM_df_value +2 -> disko_NAO2AM_n_value
+format(round(palomaa_NAO2AM_pearson, 3), nsmall = 3) -> palomaa_NAO2AM_pearson_ab
+format(round(palomaa_NAO2AM_p_value, 4), nsmall = 4) -> palomaa_NAO2AM_p_value_ab
+palomaa_NAO2AM_df_value +2 -> palomaa_NAO2AM_n_value
+format(round(disko_NAO1AM_pearson, 3), nsmall = 3) -> disko_NAO1AM_pearson_ab
+format(round(disko_NAO1AM_p_value, 4), nsmall = 4) -> disko_NAO1AM_p_value_ab
+disko_NAO1AM_df_value +2 -> disko_NAO1AM_n_value
+format(round(palomaa_NAO1AM_pearson, 3), nsmall = 3) -> palomaa_NAO1AM_pearson_ab
+format(round(palomaa_NAO1AM_p_value, 4), nsmall = 4) -> palomaa_NAO1AM_p_value_ab
+palomaa_NAO1AM_df_value +2 -> palomaa_NAO1AM_n_value
+#####
+
+#Palomaa UI stats
+stat.desc(my_data_p$UI_palomaa) -> palomaa_UI_stats
+palomaa_UI_stats[9] -> mean_UI_palomaa_full
+format(round(mean_UI_palomaa_full, 2), nsmall = 2) -> mean_UI_palomaa
+palomaa_UI_stats[13] -> sd_UI_palomaa_full
+format(round(sd_UI_palomaa_full, 2), nsmall = 2) -> sd_UI_palomaa
+
+
+#Disko UI stats
+stat.desc(my_data_d$UI_disko) -> disko_UI_stats
+disko_UI_stats[9] -> mean_UI_disko_full
+format(round(mean_UI_disko_full, 2), nsmall = 2) -> mean_UI_disko
+disko_UI_stats[13] -> sd_UI_disko_full
+format(round(sd_UI_disko_full, 2), nsmall = 2) -> sd_UI_disko
+
+#####
+
+#make dataframe and text/csv
+Correlation <- c('NAO1_Disko_t', 'NAO1_Palomaa_t', 'NAO2_Disko_t', 'NAO2_Palomaa_t', 
+                 'NAO1FMA_Disko_t', 'NAO2FMA_Disko_t', 'NAO1FMA_Palomaa_t', 'NAO2FMA_Palomaa_t', 
+                 'NAO1MJJ_Disko_t', 'NAO2MJJ_Disko_t', 'NAO1MJJ_Palomaa_t', 'NAO2MJJ_Palomaa_t',
+                 'NAO1NDJF_Disko_t', 'NAO2NDJF_Disko_t', 'NAO2NDJF_Palomaa_t', 'NAO1NDJF_Palomaa_t',
+                 'NAO1AM_Disko_t', 'NAO2AM_Disko_t', 'NAO1AM_Palomaa_t','NAO2AM_Palomaa_t',
+                 'DiskoUI_vs_t_FMA','PalomaaUI_vs_t_FMA',
+                 'DiskoUI_vs_t_MJJ','PalomaaUI_vs_t_MJJ',
+                 'DiskoUI_vs_t_NDJF','PalomaaUI_vs_t_NDJF',
+                 'DiskoUI_vs_t_AM','PalomaaUI_vs_t_AM',
+                 'NAO_1vs2','DiskoUI_vs_NAO1FMA','DiskoUI_vs_NAO2FMA','PalomaaUI_vs_NAO1FMA','PalomaaUI_vs_NAO2FMA',
+                 'DiskoUI_vs_NAO1MJJ','DiskoUI_vs_NAO2MJJ','PalomaaUI_vs_NAO1MJJ','PalomaaUI_vs_NAO2MJJ',
+                 'DiskoUI_vs_NAO1NDJF','DiskoUI_vs_NAO2NDJF','PalomaaUI_vs_NAO1NDJF','PalomaaUI_vs_NAO2NDJF',
+                 'DiskoUI_vs_NAO1AM','DiskoUI_vs_NAO2AM','PalomaaUI_vs_NAO1AM','PalomaaUI_vs_NAO2AM','DiskoUI_nofilter_nao1',
+                 'DiskoUI_nofilter_nao2','PalomaaUI_nofilter_nao1', 'PalomaaUI_nofilter_nao2')
+R_value <- c(NAO1_vs_disko_t__pearson_ab, NAO1_vs_palomaa_t__pearson_ab, NAO2_vs_disko_t__pearson_ab, NAO2_vs_palomaa_t__pearson_ab, 
+             NAO1FMA_vs_disko_t__pearson_ab, NAO2FMA_vs_disko_t__pearson_ab, NAO1FMA_vs_palomaa_t__pearson_ab, NAO2FMA_vs_palomaa_t__pearson_ab, 
+             NAO1MJJ_vs_disko_t__pearson_ab, NAO2MJJ_vs_disko_t__pearson_ab, NAO1MJJ_vs_palomaa_t__pearson_ab, NAO2MJJ_vs_palomaa_t__pearson_ab, 
+             NAO1NDJF_vs_disko_t__pearson_ab, NAO2NDJF_vs_disko_t__pearson_ab, NAO2NDJF_vs_palomaa_t__pearson_ab, NAO1NDJF_vs_palomaa_t__pearson_ab, 
+             NAO1AM_vs_disko_t__pearson_ab, NAO2AM_vs_disko_t__pearson_ab, NAO1AM_vs_palomaa_t__pearson_ab, NAO2AM_vs_palomaa_t__pearson_ab, 
+             disko_disko_t_FMA_pearson_ab, palomaa_palomaa_t_FMA_pearson_ab,disko_disko_t_MJJ_pearson_ab, 
+             palomaa_palomaa_t_MJJ_pearson_ab,disko_disko_t_NDJF_pearson_ab, palomaa_palomaa_t_NDJF_pearson_ab, 
+             disko_disko_t_AM_pearson_ab, palomaa_palomaa_t_AM_pearson_ab, 
+             NAO_1_vs_2_pearson_ab,disko_NAO1FMA_pearson_ab, disko_NAO2FMA_pearson_ab, palomaa_NAO1FMA_pearson_ab, 
+             palomaa_NAO2FMA_pearson_ab,disko_NAO1MJJ_pearson_ab, disko_NAO2MJJ_pearson_ab, palomaa_NAO1MJJ_pearson_ab, 
+             palomaa_NAO2MJJ_pearson_ab,disko_NAO1NDJF_pearson_ab, disko_NAO2NDJF_pearson_ab, palomaa_NAO1NDJF_pearson_ab, 
+             palomaa_NAO2NDJF_pearson_ab,disko_NAO1AM_pearson_ab, disko_NAO2AM_pearson_ab, palomaa_NAO1AM_pearson_ab, 
+             palomaa_NAO2AM_pearson_ab,Disko_nofilter_vs_NAO1_pearson_ab,Disko_nofilter_vs_NAO2_pearson_ab,
+             palomaa_nofilter_vs_NAO1_pearson_ab,palomaa_nofilter_vs_NAO2_pearson_ab)
+p_value <- c(NAO1_vs_disko_t__p_value_ab, NAO1_vs_palomaa_t__p_value_ab, NAO2_vs_disko_t__p_value_ab, NAO2_vs_palomaa_t__p_value_ab, 
+             NAO1FMA_vs_disko_t__p_value_ab, NAO2FMA_vs_disko_t__p_value_ab, NAO1FMA_vs_palomaa_t__p_value_ab, 
+             NAO2FMA_vs_palomaa_t__p_value_ab, NAO1MJJ_vs_disko_t__p_value_ab, NAO2MJJ_vs_disko_t__p_value_ab, 
+             NAO1MJJ_vs_palomaa_t__p_value_ab, NAO2MJJ_vs_palomaa_t__p_value_ab, NAO1NDJF_vs_disko_t__p_value_ab, 
+             NAO2NDJF_vs_disko_t__p_value_ab, NAO2NDJF_vs_palomaa_t__p_value_ab, NAO1NDJF_vs_palomaa_t__p_value_ab, 
+             NAO1AM_vs_disko_t__p_value_ab, NAO2AM_vs_disko_t__p_value_ab, NAO1AM_vs_palomaa_t__p_value_ab, NAO2AM_vs_palomaa_t__p_value_ab,
+             disko_disko_t_FMA_p_value_ab, palomaa_palomaa_t_FMA_p_value_ab,disko_disko_t_MJJ_p_value_ab, 
+             palomaa_palomaa_t_MJJ_p_value_ab,disko_disko_t_NDJF_p_value_ab, palomaa_palomaa_t_NDJF_p_value_ab, 
+             disko_disko_t_AM_p_value_ab, palomaa_palomaa_t_AM_p_value_ab,
+             NAO_1_vs_2_p_value_ab,disko_NAO1FMA_p_value_ab,disko_NAO2FMA_p_value_ab, palomaa_NAO1FMA_p_value_ab,
+             palomaa_NAO2FMA_p_value_ab,disko_NAO1MJJ_p_value_ab,disko_NAO2MJJ_p_value_ab, palomaa_NAO1MJJ_p_value_ab,
+             palomaa_NAO2MJJ_p_value_ab,disko_NAO1NDJF_p_value_ab,disko_NAO2NDJF_p_value_ab, palomaa_NAO1NDJF_p_value_ab,
+             palomaa_NAO2NDJF_p_value_ab,disko_NAO1AM_p_value_ab,disko_NAO2AM_p_value_ab, palomaa_NAO1AM_p_value_ab,
+             palomaa_NAO2AM_p_value_ab,Disko_nofilter_vs_NAO1_p_value_ab,Disko_nofilter_vs_NAO2_p_value_ab,
+             palomaa_nofilter_vs_NAO1_p_value_ab,palomaa_nofilter_vs_NAO2_p_value_ab)
+n_value <- c(NAO1_vs_disko_t__n_value, NAO1_vs_palomaa_t__n_value, NAO2_vs_disko_t__n_value, NAO2_vs_palomaa_t__n_value, 
+             NAO1FMA_vs_disko_t__n_value, NAO2FMA_vs_disko_t__n_value, NAO1FMA_vs_palomaa_t__n_value, 
+             NAO2FMA_vs_palomaa_t__n_value, NAO1MJJ_vs_disko_t__n_value, NAO2MJJ_vs_disko_t__n_value, 
+             NAO1MJJ_vs_palomaa_t__n_value, NAO2MJJ_vs_palomaa_t__n_value, NAO1NDJF_vs_disko_t__n_value, 
+             NAO2NDJF_vs_disko_t__n_value, NAO2NDJF_vs_palomaa_t__n_value, NAO1NDJF_vs_palomaa_t__n_value, 
+             NAO1AM_vs_disko_t__n_value, NAO2AM_vs_disko_t__n_value, NAO1AM_vs_palomaa_t__n_value, NAO2AM_vs_palomaa_t__n_value,
+             disko_disko_t_FMA_n_value, palomaa_palomaa_t_FMA_n_value,disko_disko_t_MJJ_n_value, 
+             palomaa_palomaa_t_MJJ_n_value,disko_disko_t_NDJF_n_value, palomaa_palomaa_t_NDJF_n_value, 
+             disko_disko_t_AM_n_value, palomaa_palomaa_t_AM_n_value,
+             NAO_1_vs_2_n_value,disko_NAO1FMA_n_value,disko_NAO2FMA_n_value, palomaa_NAO1FMA_n_value,
+             palomaa_NAO2FMA_n_value,disko_NAO1MJJ_n_value,disko_NAO2MJJ_n_value, palomaa_NAO1MJJ_n_value,
+             palomaa_NAO2MJJ_n_value,disko_NAO1NDJF_n_value,disko_NAO2NDJF_n_value, palomaa_NAO1NDJF_n_value,
+             palomaa_NAO2NDJF_n_value,disko_NAO1AM_n_value,disko_NAO2AM_n_value, palomaa_NAO1AM_n_value,
+             palomaa_NAO2AM_n_value,Disko_nofilter_vs_NAO1_n_value,Disko_nofilter_vs_NAO2_n_value,
+             palomaa_nofilter_vs_NAO1_n_value,palomaa_nofilter_vs_NAO2_n_value)
+
+NAO.statistics <- data.frame(Correlation, R_value, p_value, n_value, stringsAsFactors=FALSE)
+write.table(NAO.statistics, file = "NAO_statistics_v2.csv", sep = "\t", col.names = NA, qmethod = "escape")
+
+
+
+#----
+#plot disko
+plotZUIdisko <- ggplot() + 
+  geom_col(data = disko_NAO1filtered, aes(x = Year, y = ZUI_disko), alpha = 5/10, shape = 21, fill = "purple", color = "purple", size=4, position = "dodge") +
+  geom_col(data = disko_NAO2filtered, aes(x = Year, y = ZUI_disko), alpha = 5/10, shape = 21, fill = "purple", color = "purple", size=4, position = "dodge") +
+  geom_col(data = disko_NAO1filtered, aes(x = Year, y = NAO1FMA), alpha = 5/10, shape=23, fill="black", color="black", size=4, position = "dodge") +
+  geom_col(data = disko_NAO2filtered, aes(x = Year, y = NAO2FMA), alpha = 5/10, shape=23, fill="darkgrey", color="darkgrey", size=4, position = "dodge") +
+  geom_point(data = disko_NAO1filtered, aes(x = Year, y = ZUI_disko),shape = 21, fill = "purple", color = "orange", size=4) +
+  geom_point(data = disko_NAO2filtered, aes(x = Year, y = ZUI_disko),shape = 21, fill = "purple", color = "orange", size=4) +
+  geom_point(data = disko_NAO1filtered, aes(x = Year, y = NAO1FMA), shape=23, fill="black", color="darkgrey", size=4) +
+  geom_point(data = disko_NAO2filtered, aes(x = Year, y = NAO2FMA), shape=23, fill="darkgrey", color="black", size=4) +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_hline(yintercept= halfSD_diskoNAO2 , linetype="dashed", color = "grey")+
+  geom_hline(yintercept= - (halfSD_diskoNAO2), linetype="dashed", color = "grey")+
+  geom_hline(yintercept= halfSD_diskoNAO1 , linetype="dashed", color = "darkgrey")+
+  geom_hline(yintercept= - (halfSD_diskoNAO1), linetype="dashed", color = "darkgrey")+
+  geom_hline(yintercept= halfSD_diskoUI , linetype="dashed", color = "purple")+
+  geom_hline(yintercept= - (halfSD_diskoUI), linetype="dashed", color = "purple")+
+  
+  theme_bw() + theme(
+    aspect.ratio=0.5,
+    panel.border = element_blank(), 
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(), 
+    axis.line = element_line(colour = "black"),
+    axis.text.x = element_text(face="bold", color="black", 
+                               size=12, angle=90),
+    axis.text.y = element_text(face="bold", color="black", 
+                               size=12, angle=0))+
+  scale_x_continuous(breaks = seq(1830, 2030, by = 10))+
+  annotate("text", x = 1920, y = 2.0, label = disko_NAO1FMA_p_value_ab)+
+  annotate("text", x = 1980, y = 2.0, label = disko_NAO2FMA_p_value_ab)+
+  annotate("text", x = 1920, y = 2.25, label = disko_NAO1FMA_pearson_ab)+
+  annotate("text", x = 1980, y = 2.25, label = disko_NAO2FMA_pearson_ab)+
+  annotate("text", x = 1920, y = 2.5, label = "correlation (R) with nao1FMA and p")+
+  annotate("text", x = 1980, y = 2.5, label = "correlation (R) with nao2FMA and p")
+
+#plotZUIdisko
+
+#plot palomaa
+plotZUIpalomaa <- ggplot() + 
+  geom_col(data = palomaa_NAO1filtered, aes(x = Year, y = ZUI_palomaa), shape = 21, fill = "orange", color = "orange", size=4, position = "dodge") +
+  geom_col(data = palomaa_NAO2filtered, aes(x = Year, y = ZUI_palomaa), shape = 21, fill = "orange", color = "orange", size=4, position = "dodge") +
+  geom_col(data = palomaa_NAO1filtered, aes(x = Year, y = NAO1FMA), shape=23, fill="black", color="black", size=4, position = "dodge") +
+  geom_col(data = palomaa_NAO2filtered, aes(x = Year, y = NAO2FMA), shape=23, fill="darkgrey", color="darkgrey", size=4, position = "dodge") +
+  geom_point(data = palomaa_NAO1filtered, aes(x = Year, y = ZUI_palomaa), shape = 21, fill = "orange", color = "purple", size=4) +
+  geom_point(data = palomaa_NAO2filtered, aes(x = Year, y = ZUI_palomaa), shape = 21, fill = "orange", color = "purple", size=4) +
+  geom_point(data = palomaa_NAO1filtered, aes(x = Year, y = NAO1FMA), shape=23, fill="black", color="darkgrey", size=4) +
+  geom_point(data = palomaa_NAO2filtered, aes(x = Year, y = NAO2FMA), shape=23, fill="darkgrey", color="black", size=4) +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_hline(yintercept= halfSD_palomaaNAO2 , linetype="dashed", color = "grey")+
+  geom_hline(yintercept= - (halfSD_palomaaNAO2), linetype="dashed", color = "grey")+
+  geom_hline(yintercept= halfSD_palomaaNAO1 , linetype="dashed", color = "darkgrey")+
+  geom_hline(yintercept= - (halfSD_palomaaNAO1), linetype="dashed", color = "darkgrey")+
+  geom_hline(yintercept= halfSD_palomaaUI , linetype="dashed", color = "orange")+
+  geom_hline(yintercept= - (halfSD_palomaaUI), linetype="dashed", color = "orange")+
+  
+  theme_bw() + theme(
+    aspect.ratio=0.5,
+    panel.border = element_blank(), 
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(), 
+    axis.line = element_line(colour = "black"),
+    axis.text.x = element_text(face="bold", color="black", 
+                               size=12, angle=90),
+    axis.text.y = element_text(face="bold", color="black", 
+                               size=12, angle=0))+
+  scale_x_continuous(breaks = seq(1930, 2030, by = 5))+
+  annotate("text", x = 1980, y = 1.0, label = palomaa_NAO1FMA_p_value_ab)+
+  annotate("text", x = 1980, y = 2.0, label = palomaa_NAO2FMA_p_value_ab)+
+  annotate("text", x = 1980, y = 1.25, label = palomaa_NAO1FMA_pearson_ab)+
+  annotate("text", x = 1980, y = 2.25, label = palomaa_NAO2FMA_pearson_ab)+
+  annotate("text", x = 1980, y = 1.6, label = "correlation (R) with nao1FMA and p")+
+  annotate("text", x = 1980, y = 2.6, label = "correlation (R) with nao2FMA and p")
+
+#plotZUIpalomaa
+
+#alleUIdataPlot
+plotZUIall1 <- ggplot() + 
+  geom_point(data = my_data_p, aes(x = Year, y = ZUI_palomaa), shape = 21, fill = "orange", color = "purple", size=4) +
+  geom_point(data = my_data_d, aes(x = Year, y = ZUI_disko),shape = 21, fill = "purple", color = "orange", size=4) +
+  labs(y="Z-Scored UI Palomaa & Disko")+
+  
+  theme_bw() + theme(
+    aspect.ratio=0.5,
+    panel.border = element_blank(), 
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(), 
+    axis.line = element_line(colour = "black"))+
+  scale_x_continuous(breaks = seq(1830, 2030, by = 20))
+
+#plotZUIall1
+
+#alleUIdataPlot_plus_alleNAO
+plotZUIall2 <- ggplot() + 
+  geom_point(data = my_data_p, aes(x = Year, y = ZUI_palomaa), shape = 21, fill = "orange", color = "purple", size=4) +
+  geom_point(data = my_data_d, aes(x = Year, y = ZUI_disko),shape = 21, fill = "purple", color = "orange", size=4) +
+  geom_point(data = my_data, aes(x = Year, y = NAO1FMA), shape=23, fill="black", color="darkgrey", size=4) +
+  geom_point(data = my_data, aes(x = Year, y = NAO2FMA), shape=23, fill="darkgrey", color="black", size=4) +
+  labs(y="Z-Scored UI Palomaa & Disko")+
+  
+  theme_bw() + theme(
+    aspect.ratio=0.5,
+    panel.border = element_blank(), 
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(), 
+    axis.line = element_line(colour = "black"))+
+  scale_x_continuous(breaks = seq(1830, 2030, by = 20))
+
+#plotZUIall2
+
+plotUIraw <- ggplot() + 
+  geom_point(data = my_data_p, aes(x = Year, y = UI_palomaa), shape = 21, fill = "orange", color = "purple", size=4) +
+  geom_point(data = my_data_d, aes(x = Year, y = UI_disko), shape = 21, fill = "purple", color = "orange", size=4) +
+  labs(x = "Year CE",
+       y = "UI Palomaa & Disko",
+       color = "Legend")  +
+  annotate("text", x = 1900, y = 1.3, label = "Purple = Disko \n Orange = Palomaa")+
+  annotate("text", x = 1885, y = 1.25, label = "Palomaa mean=")+
+  annotate("text", x = 1900, y = 1.25, label = mean_UI_palomaa)+
+  annotate("text", x = 1915, y = 1.25, label = "sd=")+
+  annotate("text", x = 1920, y = 1.25, label = sd_UI_palomaa)+
+  annotate("text", x = 1885, y = 1.23, label = "Disko mean=")+
+  annotate("text", x = 1900, y = 1.23, label = mean_UI_disko)+
+  annotate("text", x = 1915, y = 1.23, label = "sd=")+
+  annotate("text", x = 1920, y = 1.23, label = sd_UI_disko)+
+  
+  
+  
+  theme_bw() +  theme(
+    aspect.ratio=0.5,
+    panel.border = element_blank(), 
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(), 
+    axis.line = element_line(colour = "black"))+
+  scale_x_continuous(breaks = seq(1830, 2030, by = 20))
+
+
+#plotUIraw
+
+figure3 <- ggplot() + 
+  geom_col(data = disko_NAO1filtered, aes(x = Year, y = ZUI_disko), alpha = 5/10, shape = 21, fill = "purple", color = "purple", size=1.5, position = "dodge") +
+  geom_col(data = disko_NAO1filtered, aes(x = Year, y = NAO1FMA), alpha = 5/10, shape=23, fill="black", color="black", size=1.5, position = "dodge") +
+  geom_point(data = disko_NAO1filtered, aes(x = Year, y = ZUI_disko),shape = 21, fill = "purple", color = "orange", size=3) +
+  geom_point(data = disko_NAO1filtered, aes(x = Year, y = NAO1FMA), shape=23, fill="black", color="darkgrey", size=3) +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_hline(yintercept= halfSD_diskoNAO1 , linetype="dashed", color = "darkgrey")+
+  geom_hline(yintercept= - (halfSD_diskoNAO1), linetype="dashed", color = "darkgrey")+
+  geom_hline(yintercept= halfSD_diskoUI , linetype="dashed", color = "purple")+
+  geom_hline(yintercept= - (halfSD_diskoUI), linetype="dashed", color = "purple")+
+  
+  theme_bw() + theme(
+    aspect.ratio=0.5,
+    panel.border = element_blank(), 
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(), 
+    axis.line = element_line(colour = "black"),
+    axis.text.x = element_text(face="bold", color="black", 
+                               size=12, angle=90),
+    axis.text.y = element_text(face="bold", color="black", 
+                               size=12, angle=0))+
+  scale_x_continuous(breaks = seq(1830, 2030, by = 10))+
+  annotate("text", x = 1920, y = 2.0, label = disko_NAO1FMA_p_value_ab)+
+  annotate("text", x = 1920, y = 2.25, label = disko_NAO1FMA_pearson_ab)+
+  annotate("text", x = 1920, y = 2.5, label = "correlation (R) with nao1FMA and p")+
+  annotate("text", x=2020,y = 0, label=".")+
+  annotate("text", x=1860,y = 0, label=".")
+
+figure4 <- ggplot() + 
+  geom_col(data = palomaa_NAO1filtered_NDJF, aes(x = Year, y = ZUI_palomaa)
+           #, alpha = 5/10
+           , shape = 21, fill = "orange", color = "orange", size=0.6, position = "dodge") +
+  geom_col(data = palomaa_NAO1filtered_NDJF, aes(x = Year, y = NAO1NDJF)
+           #, alpha = 5/10
+           , shape=23, fill="black", color="black", size=0.6, position = "dodge") +
+  geom_point(data = palomaa_NAO1filtered_NDJF, aes(x = Year, y = ZUI_palomaa),shape = 21, fill = "orange", color = "purple", size=3.5) +
+  geom_point(data = palomaa_NAO1filtered_NDJF, aes(x = Year, y = NAO1NDJF), shape=23, fill="black", color="darkgrey", size=3.5) +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_hline(yintercept= halfSD_palomaaNAO1_NDJF , linetype="dashed", color = "darkgrey")+
+  geom_hline(yintercept= - (halfSD_palomaaNAO1_NDJF), linetype="dashed", color = "darkgrey")+
+  geom_hline(yintercept= halfSD_palomaaUI , linetype="dashed", color = "orange")+
+  geom_hline(yintercept= - (halfSD_palomaaUI), linetype="dashed", color = "orange")+
+  
+  theme_bw() + theme(
+    aspect.ratio=0.5,
+    panel.border = element_blank(), 
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(), 
+    axis.line = element_line(colour = "black"),
+    axis.text.x = element_text(face="bold", color="black", 
+                               size=12, angle=90),
+    axis.text.y = element_text(face="bold", color="black", 
+                               size=12, angle=0))+
+  scale_x_continuous(breaks = seq(1930, 2030, by = 10))+
+  annotate("text", x = 1980, y = 2.0, label = palomaa_NAO1NDJF_p_value_ab)+
+  annotate("text", x = 1980, y = 2.25, label = palomaa_NAO1NDJF_pearson_ab)+
+  annotate("text", x = 1980, y = 2.5, label = "correlation (R) with nao1NDJF and p")+
+  annotate("text", x=2008,y = 0, label=".")+
+  annotate("text", x=1930,y = 0, label=".")
+
+
+#####
+#all plots:
+plotZUIall1
+plotZUIall2
+plotUIraw -> figure2
+plotZUIpalomaa
+plotZUIdisko
+show(figure2)
+show(figure3)
+show(figure4)
+
+show(NAO.statistics)
